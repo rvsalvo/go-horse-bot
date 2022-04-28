@@ -6,6 +6,7 @@ import re
 
 from dotenv import load_dotenv
 from discord.ext import commands
+from asyncio import sleep
 
 load_dotenv()
 
@@ -17,6 +18,8 @@ client = commands.Bot(command_prefix="$", description="Hey there, I'm the GoHors
 
 ## client = discord.Client()
 
+membersChannelName = "Members:"
+
 def get_quote():
   response = requests.get("https://zenquotes.io/api/random")
   json_data = json.loads(response.text)
@@ -27,10 +30,27 @@ def get_quote():
 async def hello(ctx):
   await ctx.send("Hello " + ctx.author.name + "!")
 
+@client.command()
+async def membercount(ctx):
+  for channel in ctx.guild.channels:
+    if channel.name.startswith(membersChannelName):
+      await channel.edit(name=f'{membersChannelName} {ctx.guild.member_count}')
+      break  
+  await ctx.send(ctx.guild.member_count)
+
 @client.event
 async def on_ready():
   print('We have logged in as {0.user}'.format(client))
   await client.change_presence(activity=discord.Game('GoHorse'))
+
+@client.event
+async def on_member_join(member):
+  print('member joined ' + member.name)
+  await sleep(10)
+  for channel in member.guild.channels:
+    if channel.name.startswith(membersChannelName):
+      await channel.edit(name=f'{membersChannelName} {member.guild.member_count}')
+      break
 
 @client.event
 async def on_message(message):
