@@ -32,25 +32,12 @@ async def hello(ctx):
 
 @client.command()
 async def membercount(ctx):
-  for channel in ctx.guild.channels:
-    if channel.name.startswith(membersChannelName):
-      await channel.edit(name=f'{membersChannelName} {ctx.guild.member_count}')
-      break  
   await ctx.send(ctx.guild.member_count)
 
 @client.event
 async def on_ready():
   print('We have logged in as {0.user}'.format(client))
   await client.change_presence(activity=discord.Game('GoHorse'))
-
-@client.event
-async def on_member_join(member):
-  print('member joined ' + member.name)
-  await sleep(10)
-  for channel in member.guild.channels:
-    if channel.name.startswith(membersChannelName):
-      await channel.edit(name=f'{membersChannelName} {member.guild.member_count}')
-      break
 
 @client.event
 async def on_message(message):
